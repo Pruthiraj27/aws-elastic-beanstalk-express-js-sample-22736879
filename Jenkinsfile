@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('Install Dependencies') {
             agent {
                 docker {
@@ -35,7 +36,15 @@ pipeline {
                 }
             }
             steps {
-                sh 'npm audit --audit-level=high'
+                sh '''
+                    set -o pipefail
+                    npm audit --audit-level=high | tee npm-audit.txt
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'npm-audit.txt', fingerprint: true
+                }
             }
         }
 
