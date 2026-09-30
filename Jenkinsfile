@@ -37,8 +37,10 @@ pipeline {
             }
             steps {
                 sh '''
-                    set -o pipefail
-                    npm audit --audit-level=high | tee npm-audit.txt
+                    npm audit --audit-level=high > npm-audit.txt 2>&1
+                    AUDIT_STATUS=$?
+                    cat npm-audit.txt
+                    exit $AUDIT_STATUS
                 '''
             }
             post {
