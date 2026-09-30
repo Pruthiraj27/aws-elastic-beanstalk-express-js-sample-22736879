@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:16'
-        }
-    }
+    agent none
 
     environment {
         DOCKER_IMAGE = 'pruuthiraj22736879/isec6000-node-app'
@@ -11,24 +7,40 @@ pipeline {
 
     stages {
         stage('Install Dependencies') {
+            agent {
+                docker {
+                    image 'node:16'
+                }
+            }
             steps {
                 sh 'npm ci'
             }
         }
 
         stage('Run Tests') {
+            agent {
+                docker {
+                    image 'node:16'
+                }
+            }
             steps {
                 sh 'npm test'
             }
         }
 
         stage('Dependency Security Scan') {
+            agent {
+                docker {
+                    image 'node:16'
+                }
+            }
             steps {
                 sh 'npm audit --audit-level=high'
             }
         }
 
         stage('Build Docker Image') {
+            agent any
             steps {
                 sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .'
                 sh 'docker tag $DOCKER_IMAGE:$BUILD_NUMBER $DOCKER_IMAGE:latest'
@@ -36,6 +48,7 @@ pipeline {
         }
 
         stage('Push Docker Image') {
+            agent any
             steps {
                 withCredentials([
                     usernamePassword(
